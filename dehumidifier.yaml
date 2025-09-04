@@ -31,20 +31,29 @@ select:
             args: ["x.c_str()"]
 
 sensor:
-  - platform: template
+  - platform: binary_sensor_map
+    type: sum
     id: fan_speed_sensor
     name: "Fan Speed Sensor"
-    update_interval: 10s
-    lambda: |-
-      if (id(led_7).state && id(led_6).state) {
-        return 3;  // Max speed
-      } else if (id(led_7).state) {
-        return 1;  // Slow speed
-      } else if (id(led_6).state) {
-        return 2;  // Medium speed
-      } else {
-        return NAN;  // Off
-      }
+    channels: 
+      - binary_sensor: led_7
+        value: 1
+      - binary_sensor: led_6
+        value: 2
+  # - platform: template
+  #   id: fan_speed_sensor
+  #   name: "Fan Speed Sensor"
+  #   update_interval: 10s
+  #   lambda: |-
+  #     if (id(led_7).state && id(led_6).state) {
+  #       return 3;  // Max speed
+  #     } else if (id(led_7).state) {
+  #       return 1;  // Slow speed
+  #     } else if (id(led_6).state) {
+  #       return 2;  // Medium speed
+  #     } else {
+  #       return NAN;  // Off
+  #     }
 
 script:
   - id: update_mode
