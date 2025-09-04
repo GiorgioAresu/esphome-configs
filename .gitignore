@@ -1,0 +1,13 @@
+# Gitignore settings for ESPHome
+.*history
+.cache/
+.code-server/
+!.code-server/*.json
+.esphome/
+.local/
+secrets.yaml
+
+# Temporary stuff
+archive
+/my-components/
+*.tar.gz

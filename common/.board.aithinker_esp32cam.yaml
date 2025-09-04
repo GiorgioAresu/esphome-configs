@@ -1,0 +1,45 @@
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+  level: ERROR # Maximise framerate
+
+esp32_camera:
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+  horizontal_mirror: true
+  name: Camera
+
+esp32_camera_web_server:
+  - port: 8080
+    mode: stream
+  - port: 8081
+    mode: snapshot
+
+output:
+  - platform: ledc
+    pin: GPIO4
+    id: flash
+
+light:
+  - platform: status_led
+    id: led
+    name: Led
+    pin:
+      number: GPIO2
+      # inverted: True
+    entity_category: diagnostic
+  - platform: monochromatic
+    output: flash
+    name: Flash

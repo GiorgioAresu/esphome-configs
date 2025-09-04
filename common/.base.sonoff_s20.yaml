@@ -1,0 +1,29 @@
+packages:
+  base: !include .base.yaml
+  chip: !include .chip.esp8266_generic.yaml
+
+binary_sensor:
+- platform: gpio
+  pin:
+    number: GPIO0
+    mode: INPUT_PULLUP
+    inverted: True
+  id: btn
+  on_press:
+    - switch.toggle: relay
+
+light:
+  - platform: status_led
+    id: led
+    name: Led
+    pin:
+      number: GPIO13
+      inverted: True
+    entity_category: diagnostic
+
+switch:
+- platform: gpio
+  name: Relay
+  pin: GPIO12
+  id: relay
+  device_class: outlet

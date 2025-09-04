@@ -1,0 +1,27 @@
+substitutions:
+  device_name: induction_8266
+  device_friendly_name: Induzione8266
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.amica_nodemcuv2.yaml
+  floor: !include common/.downstairs.yaml
+
+sensor:
+  - platform: ct_clamp
+    sensor: adc_sensor
+    name: "Measured Current"
+    update_interval: 10s
+    filters:
+      - calibrate_linear: # Random values for testing
+          # Measured value of 0 maps to 0A
+          - 0 -> 0
+          # Known load: 4.0A
+          # Value shown in logs: 0.1333A
+          - 0.1333 -> 4.0
+
+  - platform: adc
+    id: adc_sensor
+    name: ADC
+    pin: A0
+    update_interval: 10s

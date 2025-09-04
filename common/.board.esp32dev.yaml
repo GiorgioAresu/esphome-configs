@@ -1,0 +1,17 @@
+esp32:
+  board: upesy_wroom #esp32dev
+  framework:
+    type: esp-idf
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+light:
+  - platform: status_led
+    id: led
+    name: Led
+    pin:
+      number: GPIO2
+      # inverted: True
+    entity_category: diagnostic

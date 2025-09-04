@@ -1,0 +1,13 @@
+substitutions:
+  device_name: esp32-cam
+  device_friendly_name: ESP Camera
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.aithinker_esp32cam.yaml
+  downstairs: !include common/.downstairs.yaml
+
+esp32_camera:
+  # max_framerate: 10Hz # Max 60Hz
+  #resolution: 1600X1200
+  brightness: 2

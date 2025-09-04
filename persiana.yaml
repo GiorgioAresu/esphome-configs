@@ -1,0 +1,63 @@
+substitutions:
+  device_name: persiana
+  device_friendly_name: Persiana
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.amica_nodemcuv2.yaml
+  floor: !include common/.downstairs.yaml
+
+# binary_sensor:
+#   - platform: gpio
+#     pin:
+#       number: D5
+#       mode: 
+#         input: True
+#         pullup: True
+#       # inverted: True
+#     name: "contact"
+#     device_class: door
+
+servo:
+  - id: my_servo
+    output: pwm_output
+    # transition_length: 10s
+    auto_detach_time: 10s
+    # min_level: 0%
+    # max_level: 100%
+
+# Example output platform
+# On ESP32, use ledc output
+output:
+  - platform: esp8266_pwm
+    id: pwm_output
+    pin: D6
+    frequency: 50 Hz
+
+cover:
+  - platform: template
+    name: Pannello superiore
+    id: top
+    device_class: shutter
+    optimistic: True
+    close_action:
+      then:
+        - servo.write:
+            id: my_servo
+            level: 1
+    open_action:
+      then:
+        - servo.write:
+            id: my_servo
+            level: -1
+    has_position: True
+    position_action:
+      then:
+        - servo.write:
+            id: my_servo
+            level: !lambda 'return 1.0-pos*2;'
+    # tilt_action:
+    #   then:
+    #     - servo.write:
+    #         id: my_servo
+    #         level: !lambda 'return 1.0-tilt*2;'

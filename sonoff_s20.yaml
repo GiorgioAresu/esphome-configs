@@ -1,0 +1,12 @@
+substitutions:
+  device_name: stufetta
+  device_friendly_name: Stufetta
+  
+packages:
+  base: !include common/.base.sonoff_s20.yaml
+  floor: !include common/.downstairs.yaml
+
+switch:
+- id: !extend relay
+  device_class: outlet
+  icon: mdi:radiator

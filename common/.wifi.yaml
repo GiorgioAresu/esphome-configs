@@ -1,0 +1,57 @@
+wifi:
+  domain: !secret iot_domain
+  ap:
+    ssid: ${device_name}_hotspot
+    password: !secret fallback_password
+captive_portal:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+  - platform: web_server
+
+web_server:
+  port: 80
+  local: True
+  auth:
+    username: !secret webserver_username
+    password: !secret webserver_password
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi RSSI"
+    id: wifi_rssi
+    update_interval: 10s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 6
+          send_every: 6
+    entity_category: "diagnostic"
+
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_rssi
+    id: wifi_quality
+    name: "WiFi Quality"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+    device_class: ""
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      id: wifi_ip_address
+      name: "IP Address"
+      icon: "mdi:wan"
+      entity_category: "diagnostic"
+    bssid:
+      id: wifi_bssid
+      name: "BSSID"
+      icon: "mdi:wan"
+      entity_category: "diagnostic"

@@ -1,0 +1,43 @@
+substitutions:
+  device_name: irrigation_small
+  device_friendly_name: Irrigazione Piccola
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.amica_nodemcuv2.yaml
+  floor: !include common/.downstairs.yaml
+
+switch:
+  - platform: gpio
+    id: pump
+    pin: GPIO1 # TXD
+    inverted: True
+    on_turn_on: 
+      then:
+        light.turn_on: led
+    on_turn_off: 
+      then:
+        light.turn_off: led
+
+sensor:
+  - platform: duty_time
+    id: pump_total_runtime
+    name: Tempo funzionamento pompa
+    lambda: 'return id(pump).state'
+    restore: True
+
+button:
+  - platform: template
+    id: reset_runtime
+    name: Resetta tempo funzionamento
+    on_press: 
+      then:
+        sensor.duty_time.reset: pump_total_runtime
+
+sprinkler:
+  - id: sprinkler_ctrlr
+    standby_switch: "Disattiva programmazione"
+    valves:
+      - run_duration_number: "Durata ciclo"
+        valve_switch_id: pump
+        valve_switch: Pompa

@@ -1,0 +1,16 @@
+logger:
+  #level: INFO
+  level: DEBUG
+  #level: VERY_VERBOSE
+  logs:
+    component: ERROR
+    ## Enable the following when base level is DEBUG
+    #opentherm: WARN
+    # sensor: WARN
+    # opentherm.output: INFO
+    ## Enable the following when base level is VERY_VERBOSE
+    #esp32.preferences: WARN
+    #dallas.sensor: WARN
+    #scheduler: WARN
+    #sensor.filter: WARN
+    #api.service: WARN

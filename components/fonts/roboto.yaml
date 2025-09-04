@@ -1,0 +1,42 @@
+font:
+  - file: "gfonts://Roboto"
+    id: roboto_16
+    size: 16
+    bpp: 4
+    extras:
+      - file: "fonts/materialdesignicons-webfont.woff"
+        glyphs: [
+          $icon_ha,
+          $icon_wifi,
+        ]
+  - file: "gfonts://Roboto"
+    id: roboto_24
+    size: 24
+    bpp: 4
+    extras:
+      - file: "fonts/materialdesignicons-webfont.woff"
+        glyphs: [
+          $icon_cancel,
+          $icon_confirm,
+        ]
+  - file: "gfonts://Roboto"
+    id: roboto_28
+    size: 28
+    bpp: 4
+    extras:
+      - file: "fonts/materialdesignicons-webfont.woff"
+        glyphs: [
+          $icon_security,
+          $icon_ha,
+        ]
+  - file: "gfonts://Roboto"
+    id: roboto_128
+    size: 128
+    bpp: 4
+    extras:
+      - file: "fonts/materialdesignicons-webfont.woff"
+        glyphs: [
+          $icon_alarm_state_armed_away,
+          $icon_alarm_state_armed_home,
+          $icon_alarm_state_armed_night,
+        ]

@@ -1,0 +1,35 @@
+substitutions:
+  device_name: rack
+  device_friendly_name: Rack
+  current_res: "0.00230" # Higher value gives lower watt readout
+  voltage_div: "788" # Lower value gives lower voltage readout
+  # washing_trigger_consumption: "2" # 20221030: Was 3W, shutting down unexpectedly before end of cycle (with handwashing/wool program)
+
+packages:
+  base: !include common/.base.teckin.yaml
+  floor: !include common/.downstairs.yaml
+
+# binary_sensor:
+#   - platform: template
+#     name: "running"
+#     id: washing
+
+sensor:
+  - id: !extend power_sensor
+    power:
+      on_value_range:
+        - above: ${washing_trigger_consumption}
+          then:
+          - binary_sensor.template.publish:
+              id: washing
+              state: ON
+        - below: ${washing_trigger_consumption}
+          then:
+          - binary_sensor.template.publish:
+              id: washing
+              state: OFF
+
+switch:
+  - id: !extend relay
+    restore_mode: RESTORE_DEFAULT_ON
+    device_class: outlet

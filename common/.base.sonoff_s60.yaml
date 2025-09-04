@@ -1,0 +1,47 @@
+packages:
+  base: !include .base.yaml
+  chip: !include .chip.esp32_c3.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+
+status_led:
+    pin:
+      number: GPIO5
+      inverted: true
+
+switch:
+  - id: relay
+    platform: gpio
+    name: "Relay"
+    pin: GPIO4
+    restore_mode: ALWAYS_ON
+
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    internal: true
+    pin:
+      number: GPIO9
+    on_press:
+      - switch.toggle: relay
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+
+sensor:
+  - platform: cse7766
+    current:
+      name: ${device_friendly_name} Current
+    voltage:
+      name: ${device_friendly_name} Voltage
+    power:
+      name: ${device_friendly_name} Power
+    energy:
+      name: ${device_friendly_name} Energy
+
+uart:
+  rx_pin: GPIO7
+  baud_rate: 4800
+  parity: EVEN

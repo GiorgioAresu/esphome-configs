@@ -1,0 +1,6 @@
+wifi:
+  networks:
+  - <<: !include .wifi.upstairs.yaml
+    priority: 2
+  - <<: !include .wifi.downstairs.yaml
+    priority: 0

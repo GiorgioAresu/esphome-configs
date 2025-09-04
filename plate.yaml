@@ -1,0 +1,486 @@
+substitutions:
+  device_name: plate
+  device_friendly_name: Plate
+  
+  # alarm_code_placeholder: "CODE"
+
+  icon_wifi: "\U000F05A9" #mdi:wifi
+  icon_ha: "\U000F07D0" #mdi:home-assistant
+  icon_security: "\U000F0483" #mdi:security
+  icon_cancel: "\U000F0156" #mdi:close
+  icon_confirm: "\U000F012C" #mdi:check
+
+  icon_alarm_state_armed_away: "\U000F099D" #mdi:shield-lock
+  icon_alarm_state_armed_home: "\U000F068A" #mdi:shield-home
+  icon_alarm_state_armed_night: "\U000F1828" #mdi:shield-moon
+  
+
+packages:
+  base: !include common/.base.ZX3D95CE01S-TR.yaml
+  # floor: !include common/.wifi.downstairs.yaml
+  theme: !include common/.md_theme.yaml
+  font: !include components/fonts/roboto.yaml
+
+esphome:
+
+api:
+  on_client_connected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - lvgl.widget.show: lbl_ha_status
+          # - lvgl.widget.hide: boot_screen
+  on_client_disconnected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - lvgl.widget.hide: lbl_ha_status
+
+wifi:
+  on_connect:
+    - lvgl.widget.show: lbl_wifi_status
+  on_disconnect:
+    - lvgl.widget.hide: lbl_wifi_status
+  ssid: "GeS-Travel"
+  password: "w65bGacM-Ci5qArg0"
+
+time:
+  - platform: homeassistant
+    id: time_ha
+    on_time_sync:
+      - lvgl.label.update:
+          id: lbl_time
+          text:
+            time_format: "%H:%M"
+            time: !lambda return id(time_ha).utcnow();
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - if:
+              condition:
+                time.has_time:
+              then:
+                - lvgl.label.update:
+                    id: lbl_time
+                    text:
+                      time_format: "%H:%M"
+                      time: !lambda return id(time_ha).utcnow();
+              else:
+                - lvgl.label.update:
+                    id: lbl_time
+                    text: "\n"
+
+key_collector:
+  - id: alarm_code_collector
+    source_id: alarm_num_keypad
+    min_length: 4
+    max_length: 4
+    end_keys: "#"
+    end_key_required: true
+    back_keys: "*"
+    allowed_keys: "0123456789*#"
+    timeout: 5s
+    on_timeout: 
+      then:
+        - lvgl.widget.hide: keypad_dialog
+    on_progress:
+      - if:
+          condition:
+            lambda: return (0 != x.compare(std::string{""}));
+          then:
+            - lvgl.label.update:
+                id: lvgl_label
+                text: !lambda 'return x.c_str();'
+                # bg_opa: 70%
+          else:
+            - lvgl.label.update:
+                id: lvgl_label
+                text: "\n" #$alarm_code_placeholder
+                # bg_opa: COVER
+    on_result:
+      - logger.log:
+          format: "Code entered: %s, Mode: %c"
+          args: ['x.c_str()', 'id(alarm_mode)']
+      - if:
+          condition:
+            lambda: return id(alarm_mode) == 'D';  # 'D' = 68
+          then:
+            - logger.log: "Calling alarmo.disarm"
+            - homeassistant.service:
+                service: alarmo.disarm
+                data:
+                  entity_id: alarm_control_panel.alarmo
+                  code: !lambda 'return x;'
+          else:
+            - if:
+                condition:
+                  lambda: return id(alarm_mode) == 'H';
+                then:
+                  - logger.log: "Calling alarmo.arm with mode: home"
+                  - homeassistant.service:
+                      service: alarmo.arm
+                      data:
+                        entity_id: alarm_control_panel.alarmo
+                        mode: home
+                        code: !lambda 'return x;'
+                else:
+                  - if:
+                      condition:
+                        lambda: return id(alarm_mode) == 'A';
+                      then:
+                        - logger.log: "Calling alarmo.arm with mode: away"
+                        - homeassistant.service:
+                            service: alarmo.arm
+                            data:
+                              entity_id: alarm_control_panel.alarmo
+                              mode: away
+                              code: !lambda 'return x;'
+                      else:
+                        - if:
+                            condition:
+                              lambda: return id(alarm_mode) == 'N';
+                            then:
+                              - logger.log: "Calling alarmo.arm with mode: night"
+                              - homeassistant.service:
+                                  service: alarmo.arm
+                                  data:
+                                    entity_id: alarm_control_panel.alarmo
+                                    mode: night
+                                    code: !lambda 'return x;'
+                            else:
+                              - logger.log:
+                                  format: "Invalid alarm mode: %c"
+                                  args: ['id(alarm_mode)']
+      - lvgl.widget.hide: keypad_dialog
+
+globals:
+  - id: alarm_mode
+    type: int
+
+# text_sensor:
+#   - platform: homeassistant
+#     id: alarm_status
+#     entity_id: alarm_control_panel.alarmo
+#     filters:
+#       - map: # https://github.com/nielsfaber/alarmo/blob/main/custom_components/alarmo/frontend/localize/languages/it.json#L3
+#         - armed_away -> $icon_state_armed_away Armed away
+#         - armed_custom_bypass -> $icon_state_armed_custom_bypass Armed custom
+#         - armed_home -> $icon_state_armed_home Armed home
+#         - armed_night -> $icon_state_armed_night Armed night
+#         - arming -> $icon_state_arming Arming
+#         - disarmed -> $icon_state_disarmed Disarmed
+#         - triggered -> $icon_state_triggered Triggered
+#     # on_value:
+#     #   then:
+#     #     - lvgl.label.update:
+#     #         id: alarm_status_lbl
+#     #         text: !lambda return x.c_str();
+#     on_raw_value:
+#       then:
+#         - lambda: |-
+#             ESP_LOGD("main", "The alarm status is %s", x.c_str());
+
+lvgl:
+  theme:
+    obj:
+      border_width: 0
+      pad_all: 0
+      radius: 0
+    label:
+      border_width: 0
+      pad_all: 0
+      radius: 0
+  top_layer:
+    widgets:
+      # - obj:
+      #     grid_cell_column_pos: 0
+      #     grid_cell_row_pos: 0
+      #     grid_cell_x_align: STRETCH
+      #     grid_cell_y_align: STRETCH
+      #     bg_color: ${md_color_surface_container_highest}
+      #     align: TOP_MID
+      #     height: 72
+      #     width: 100%
+      #     widgets:
+      - obj:
+          id: status_bar
+          layout:
+            type: FLEX
+            flex_flow: ROW
+            pad_column: ${md_space_extra_small}
+          align: TOP_MID
+          height: 24
+          width: 100%
+          pad_all: ${md_space_extra_small}
+          bg_color: ${md_color_surface_container_highest}
+          text_align: RIGHT
+          text_color: ${md_color_on_surface}
+          text_font: ${md_font_headline_small}
+          widgets:
+            - label:
+                id: lbl_time
+                text: "\n"
+            - obj:
+                height: 16
+                flex_grow: 1
+                bg_color: ${md_color_surface_container_highest}
+            - label:
+                id: lbl_ha_status
+                text: $icon_ha
+                hidden: true
+            - label:
+                id: lbl_wifi_status
+                text: $icon_wifi
+                hidden: true
+      - <<: !include 
+          file: components/lvgl/page_title.yaml
+          vars:
+            icon: $icon_ha
+            icon_size: 48
+            title: "Allarme"
+      - obj:
+          align: BOTTOM_MID
+          height: 24
+          width: 100%
+          bg_color: ${md_color_surface_container}
+          on_gesture:
+            then:
+              - lambda: |-
+                  ESP_LOGD("main", "Gesture detected");
+          # on_all_events:
+          #   then:
+          #     - lambda: |-
+          #         ESP_LOGD("main", "Event detected");
+          on_swipe_left:
+            then:
+              - lvgl.page.next:
+          on_press:
+            then:
+              - lvgl.page.next:
+          on_swipe_up:
+            then:
+              - lvgl.page.show: alarm_page
+          on_swipe_right:
+            then:
+              - lvgl.page.previous:
+          widgets:
+            - obj:
+                align: CENTER
+                width: 33%
+                height: 8
+                radius: ${md_corner_small}
+                bg_color: ${md_color_on_surface}
+      # - buttonmatrix:
+      #     align: bottom_mid
+      #     # styles: header_footer
+      #     bg_color: 0xdddddd
+      #     text_color: 0x212121
+      #     text_font: montserrat_24
+      #     height: 64
+      #     pad_all: 0
+      #     outline_width: 0
+      #     id: top_layer
+      #     # items:
+      #       # styles: header_footer
+      #     rows:
+      #       - buttons:
+      #         - id: page_prev
+      #           text: "\uF053"
+      #           on_press:
+      #             then:
+      #               lvgl.page.previous:
+      #         - id: page_home
+      #           text: "\uF015"
+      #           on_press:
+      #             then:
+      #               lvgl.page.show: alarm_page
+      #         - id: page_next
+      #           text: "\uF054"
+      #           on_press:
+      #             then:
+      #               lvgl.page.next:
+
+  page_wrap: true
+  pages:
+    - <<: !include 
+        file: components/lvgl/page.yaml
+        vars:
+          id: alarm_page
+          icon: $icon_security
+          title: Allarme
+          widgets:
+            - obj:
+                layout:
+                  type: GRID
+                  grid_columns: [FR(4), FR(1), FR(4)]
+                  grid_rows: [FR(3), FR(1), FR(2), FR(2)]
+                pad_all: 20
+                height: 100%
+                width: 100%
+                widgets:
+                  - label:
+                      grid_cell_row_pos: 0
+                      grid_cell_column_pos: 0
+                      grid_cell_x_align: STRETCH
+                      grid_cell_y_align: STRETCH
+                      grid_cell_column_span: 3
+                      text: $icon_alarm_state_armed_away
+                      align: CENTER
+                      text_align: CENTER
+                      text_color: $md_color_success
+                      text_font: roboto_128
+                      outline_width: 1
+                      outline_color: 0x00ff00
+                      outline_opa: COVER
+                  - label:
+                      grid_cell_row_pos: 1
+                      grid_cell_column_pos: 0
+                      grid_cell_x_align: STRETCH
+                      grid_cell_y_align: STRETCH
+                      grid_cell_column_span: 3
+                      text: "ARMED: Away"
+                      align: CENTER
+                      text_align: CENTER
+                      text_color: $md_color_on_surface
+                      text_font: $md_font_display_large
+                      outline_width: 1
+                      outline_color: 0x0000ff
+                      outline_opa: COVER
+            # Keypad dialog
+            - obj:
+                id: keypad_dialog
+                align: CENTER
+                width: 100%
+                height: 100%
+                bg_color: $md_color_scrim
+                bg_opa: 50%
+                pad_all: $md_space_large
+                # hidden: true
+                widgets:
+                  - obj:
+                      align: CENTER
+                      width: 300
+                      height: 300
+                      pad_all: $md_space_medium
+                      radius: $md_corner_large
+                      bg_color: $md_color_surface_container_highest
+                      
+                      shadow_width: ${md_elevation_3_shadow_width}
+                      shadow_color: ${md_color_shadow}
+                      shadow_opa: ${md_elevation_3_shadow_opa}
+                      shadow_ofs_y: 4
+
+                      layout:
+                        type: GRID
+                        grid_rows: [FR(1), FR(4)]
+                        grid_columns: [FR(1)]
+                      widgets:
+                        # - obj:
+                        #     grid_cell_row_pos: 0
+                        #     grid_cell_column_pos: 0
+                        #     grid_cell_x_align: STRETCH
+                        #     grid_cell_y_align: STRETCH
+                        #     border_width: 1
+                        #     border_color: 0
+                        #     border_opa: 50%
+                        #     pad_all: 0
+                        #     bg_opa: 80%
+                        #     bg_color: $md_color_primary
+                        #     radius: $md_corner_extra_large
+                        #     widgets:
+                        - label:
+                            grid_cell_row_pos: 0
+                            grid_cell_column_pos: 0
+                            grid_cell_x_align: STRETCH
+                            grid_cell_y_align: STRETCH
+                            id: lvgl_label
+                            align: CENTER
+                            text: "\n" #$alarm_code_placeholder
+                            text_align: CENTER
+                            text_font: $md_font_display_large
+                            text_color: $md_color_primary
+                        - buttonmatrix:
+                            grid_cell_row_pos: 1
+                            grid_cell_column_pos: 0
+                            grid_cell_x_align: STRETCH
+                            grid_cell_y_align: STRETCH
+                            id: alarm_num_keypad
+                            pad_all: $md_space_extra_small
+                            border_width: 0
+                            bg_opa: TRANSP
+                            # on_boot:
+                            #   then:
+                            #     - lvgl.matrix.button.update:
+                            #         id: alarm_del_btn
+                            #         # bg_color: 0xf44336
+                            #     - lvgl.matrix.button.update:
+                            #         id: alarm_confirm_btn
+                            #         # bg_color: 0x4caf50
+                            items:
+                              text_font: $md_font_display_medium
+                              radius: $md_corner_extra_large
+                              shadow_width: 0
+                              bg_color: $md_color_surface
+                              text_color: $md_color_on_surface
+                            rows:
+                              - buttons:
+                                  - text: 1
+                                    control:
+                                      no_repeat: true
+                                  - text: 2
+                                    control:
+                                      no_repeat: true
+                                  - text: 3
+                                    control:
+                                      no_repeat: true
+                              - buttons:
+                                  - text: 4
+                                    control:
+                                      no_repeat: true
+                                  - text: 5
+                                    control:
+                                      no_repeat: true
+                                  - text: 6
+                                    control:
+                                      no_repeat: true
+                              - buttons:
+                                  - text: 7
+                                    control:
+                                      no_repeat: true
+                                  - text: 8
+                                    control:
+                                      no_repeat: true
+                                  - text: 9
+                                    control:
+                                      no_repeat: true
+                              - buttons:
+                                  - text: "${ '#%06x' % $md_color_error} $icon_cancel#"
+                                    key_code: "*"
+                                    control:
+                                      no_repeat: true
+                                      recolor: true
+                                    id: alarm_del_btn
+                                  - text: 0
+                                    control:
+                                      no_repeat: true
+                                  - text: "${ '#%06x' % $md_color_success} $icon_confirm#"
+                                    key_code: "#"
+                                    control:
+                                      no_repeat: true
+                                      recolor: true
+                                    id: alarm_confirm_btn
+    - <<: !include 
+        file: components/lvgl/page.yaml
+        vars:
+          id: test_page
+          icon: $icon_ha
+          title: Test page
+          widgets:
+            - label:
+                text: PAGE 2
+                align: CENTER
+                text_align: CENTER
+                text_color: $md_color_error

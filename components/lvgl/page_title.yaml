@@ -1,0 +1,29 @@
+- obj:
+    align_to: 
+        id: status_bar
+        align: OUT_BOTTOM_MID
+    height: 56
+    width: 100%
+    pad_all: ${md_space_extra_small}
+    bg_color: ${md_color_surface_container_highest}
+    widgets:
+    - label:
+        id: lbl_page_icon
+        height: ${icon_size}
+        width: ${icon_size}
+        align: LEFT_MID
+        bg_color: ${md_color_on_surface}
+        text: ${icon}
+        text_font: ${md_font_display_large}
+        text_align: CENTER
+        pad_top: ${icon_size / 6 | int}
+    - label:
+        text: ${title}
+        id: lbl_page_title
+        align_to: 
+            id: lbl_page_icon
+            align: OUT_RIGHT_MID
+            x: ${md_space_extra_small}
+        text_align: LEFT
+        text_color: ${md_color_on_surface}
+        text_font: ${md_font_display_medium}

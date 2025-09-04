@@ -1,0 +1,31 @@
+substitutions:
+  device_name: ble-tracker
+  device_friendly_name: BLE Tracker
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.esp32dev.yaml
+  upstairs: !include common/.upstairs.yaml
+
+esp32_ble_tracker:
+  scan_parameters:
+  #   interval: 1100ms
+  #   window: 1100ms
+    active: true
+
+# bluetooth_proxy:
+#   active: true
+
+sensor:
+  - platform: xiaomi_hhccjcy01
+    mac_address: C4:7C:8D:6B:20:9F
+    temperature:
+      name: "Dracena Temperature"
+    moisture:
+      name: "Dracena Moisture"
+    illuminance:
+      name: "Dracena Illuminance"
+    conductivity:
+      name: "Dracena Soil Conductivity"
+    battery_level:
+      name: "Dracena Battery Level"

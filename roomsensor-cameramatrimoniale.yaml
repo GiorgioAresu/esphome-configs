@@ -1,0 +1,23 @@
+substitutions:
+  device_name: camera-matrimoniale
+  device_friendly_name: Camera Matrimoniale
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.amica_nodemcuv2.yaml
+  floor: !include common/.upstairs.yaml
+
+sensor:
+  - platform: dht
+    pin:
+      number: D1
+      mode:
+        input: true
+        pullup: true
+    temperature:
+      name: "Temperatura"
+      id: test_temperature
+    humidity:
+      name: "Umidità"
+      id: test_humidity
+    update_interval: 60s

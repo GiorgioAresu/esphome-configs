@@ -1,0 +1,26 @@
+debug:
+  update_interval: 5s
+
+sensor:
+  # Debug sensors
+  - platform: debug
+    free:
+      id: debug_heap_free
+      name: "Heap Free"
+      entity_category: diagnostic
+    block:
+      id: debug_heam_max_block
+      name: "Heap Max Block"
+      entity_category: diagnostic
+    loop_time:
+      id: debug_loop_time
+      name: "Loop Time"
+      entity_category: diagnostic
+
+text_sensor:
+  - platform: wifi_info
+    scan_results:
+      id: wifi_scan_results
+      name: "Wi-Fi scan results"
+      icon: "mdi:wan"
+      entity_category: "diagnostic"

@@ -1,0 +1,50 @@
+substitutions:
+  device_name: bagno-principale
+  device_friendly_name: Bagno Principale
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.xiao_esp32c6.yaml
+  floor: !include common/.upstairs.yaml
+
+i2c:
+  sda: GPIO22
+  scl: GPIO23
+  scan: true
+  id: bus
+
+sensor:
+  - platform: sht3xd
+    temperature:
+      name: "Temperatura"
+    humidity:
+      name: "Umidità"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO16
+      mode:
+        input: true
+        pullup: true
+    name: "Finestra"
+    device_class: window
+    
+  # - platform: dht
+  #   pin:
+  #     number: GPIO16
+  #     mode:
+  #       input: true
+  #       pullup: true
+  #   update_interval: 60s
+  # - platform: dht
+  #   pin:
+  #     number: GPIO23
+  #     mode:
+  #       input: true
+  #       pullup: true
+  #   temperature:
+  #     name: "Temperatura 2"
+  #   humidity:
+  #     name: "Umidità 2"
+  #   update_interval: 60s

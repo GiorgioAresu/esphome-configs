@@ -1,0 +1,6 @@
+- lvgl.label.update:
+    id: lbl_page_icon
+    text: ${icon}
+- lvgl.label.update:
+    id: lbl_page_title
+    text: ${title}

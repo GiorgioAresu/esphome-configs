@@ -1,0 +1,246 @@
+substitutions:
+  device_name: rf-bridge
+  device_friendly_name: Sonoff RF-Bridge
+
+packages:
+  base: !include common/.base.yaml
+  chip: !include common/.chip.esp8266_generic.yaml
+  floor: !include common/.downstairs.yaml
+
+# TODO: Move to esp-idf might help with flash usage
+
+esphome:
+  areas:
+    - id: cucina
+      name: "Cucina"
+  devices:
+    - id: cappa
+      name: "Cappa"
+      area_id: cucina
+
+web_server:
+  local: False # Reduce storage for OTA
+
+light:
+  - platform: status_led
+    id: led
+    name: Led
+    pin:
+      number: GPIO13
+      inverted: True
+  - platform: binary
+    id: cappa_luce
+    output: cappa_luce_output
+    name: Luce
+    device_id: cappa
+    restore_mode: RESTORE_DEFAULT_OFF
+
+remote_receiver:
+  pin: GPIO4
+  dump:
+    # - byronsx
+    # - dooya
+    # - drayton
+    # - keeloq
+    # - nexa
+    - rc_switch
+  # filter: 50us
+  # idle: 2ms
+  filter: 4us
+  idle: 1ms
+  tolerance: 50%
+
+remote_transmitter:
+  pin: GPIO5
+  carrier_duty_percent: 100%
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/muxa/esphome-state-machine
+
+text_sensor:
+  - platform: state_machine
+    name: State Machine
+    id: cappa_state_machine
+    device_id: cappa
+    entity_category: diagnostic
+
+state_machine:
+  - id: cappa_statemachine
+    # diagram: dot
+    states:
+      - name: LIGHT_OFF_FAN_0
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111111111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_OFF_FAN_1
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111101111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_OFF_FAN_2
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111011111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_OFF_FAN_3
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111001111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_OFF_FAN_4
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111110111111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_ON_FAN_0
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111110111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_ON_FAN_1
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111100111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_ON_FAN_2
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111010111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_ON_FAN_3
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111111000111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+      - name: LIGHT_ON_FAN_4
+        on_enter: 
+          remote_transmitter.transmit_rc_switch_raw:
+            code: '0111110110111011'
+            protocol: 6
+            repeat:
+              times: 10
+              wait_time: 0s
+    inputs:
+      - name: LIGHT_ON
+        transitions:
+          - LIGHT_OFF_FAN_0 -> LIGHT_ON_FAN_0
+          - LIGHT_OFF_FAN_1 -> LIGHT_ON_FAN_1
+          - LIGHT_OFF_FAN_2 -> LIGHT_ON_FAN_2
+          - LIGHT_OFF_FAN_3 -> LIGHT_ON_FAN_3
+          - LIGHT_OFF_FAN_4 -> LIGHT_ON_FAN_4
+      - name: LIGHT_OFF
+        transitions:
+          - LIGHT_ON_FAN_0 -> LIGHT_OFF_FAN_0
+          - LIGHT_ON_FAN_1 -> LIGHT_OFF_FAN_1
+          - LIGHT_ON_FAN_2 -> LIGHT_OFF_FAN_2
+          - LIGHT_ON_FAN_3 -> LIGHT_OFF_FAN_3
+          - LIGHT_ON_FAN_4 -> LIGHT_OFF_FAN_4
+      - name: FAN_0
+        transitions:
+          - LIGHT_OFF_FAN_1 -> LIGHT_OFF_FAN_0
+          - LIGHT_OFF_FAN_2 -> LIGHT_OFF_FAN_0
+          - LIGHT_OFF_FAN_3 -> LIGHT_OFF_FAN_0
+          - LIGHT_OFF_FAN_4 -> LIGHT_OFF_FAN_0
+          - LIGHT_ON_FAN_1 -> LIGHT_ON_FAN_0
+          - LIGHT_ON_FAN_2 -> LIGHT_ON_FAN_0
+          - LIGHT_ON_FAN_3 -> LIGHT_ON_FAN_0
+          - LIGHT_ON_FAN_4 -> LIGHT_ON_FAN_0
+      - name: FAN_1
+        transitions:
+          - LIGHT_OFF_FAN_0 -> LIGHT_OFF_FAN_1
+          - LIGHT_OFF_FAN_2 -> LIGHT_OFF_FAN_1
+          - LIGHT_OFF_FAN_3 -> LIGHT_OFF_FAN_1
+          - LIGHT_OFF_FAN_4 -> LIGHT_OFF_FAN_1
+          - LIGHT_ON_FAN_0 -> LIGHT_ON_FAN_1
+          - LIGHT_ON_FAN_2 -> LIGHT_ON_FAN_1
+          - LIGHT_ON_FAN_3 -> LIGHT_ON_FAN_1
+          - LIGHT_ON_FAN_4 -> LIGHT_ON_FAN_1
+      - name: FAN_2
+        transitions:
+          - LIGHT_OFF_FAN_0 -> LIGHT_OFF_FAN_2
+          - LIGHT_OFF_FAN_1 -> LIGHT_OFF_FAN_2
+          - LIGHT_OFF_FAN_3 -> LIGHT_OFF_FAN_2
+          - LIGHT_OFF_FAN_4 -> LIGHT_OFF_FAN_2
+          - LIGHT_ON_FAN_0 -> LIGHT_ON_FAN_2
+          - LIGHT_ON_FAN_1 -> LIGHT_ON_FAN_2
+          - LIGHT_ON_FAN_3 -> LIGHT_ON_FAN_2
+          - LIGHT_ON_FAN_4 -> LIGHT_ON_FAN_2
+      - name: FAN_3
+        transitions:
+          - LIGHT_OFF_FAN_0 -> LIGHT_OFF_FAN_3
+          - LIGHT_OFF_FAN_1 -> LIGHT_OFF_FAN_3
+          - LIGHT_OFF_FAN_2 -> LIGHT_OFF_FAN_3
+          - LIGHT_OFF_FAN_4 -> LIGHT_OFF_FAN_3
+          - LIGHT_ON_FAN_0 -> LIGHT_ON_FAN_3
+          - LIGHT_ON_FAN_1 -> LIGHT_ON_FAN_3
+          - LIGHT_ON_FAN_2 -> LIGHT_ON_FAN_3
+          - LIGHT_ON_FAN_4 -> LIGHT_ON_FAN_3
+      - name: FAN_4
+        transitions:
+          - LIGHT_OFF_FAN_0 -> LIGHT_OFF_FAN_4
+          - LIGHT_OFF_FAN_1 -> LIGHT_OFF_FAN_4
+          - LIGHT_OFF_FAN_2 -> LIGHT_OFF_FAN_4
+          - LIGHT_OFF_FAN_3 -> LIGHT_OFF_FAN_4
+          - LIGHT_ON_FAN_0 -> LIGHT_ON_FAN_4
+          - LIGHT_ON_FAN_1 -> LIGHT_ON_FAN_4
+          - LIGHT_ON_FAN_2 -> LIGHT_ON_FAN_4
+          - LIGHT_ON_FAN_3 -> LIGHT_ON_FAN_4
+
+output:
+  - platform: template
+    type: binary
+    id: cappa_luce_output
+    write_action:
+      if:
+        condition:
+          light.is_on: cappa_luce
+        then:
+          - state_machine.transition: LIGHT_ON
+        else:
+          - state_machine.transition: LIGHT_OFF
+
+fan:
+  - platform: template
+    name: Ventola
+    device_id: cappa
+    restore_mode: RESTORE_DEFAULT_OFF
+    speed_count: 4
+    on_state:
+      - lambda: |-
+          if (x->state == 0) {
+            id(cappa_statemachine).transition("FAN_0");
+          } else {
+            int speed = x->speed;
+            std::string transition_name = "FAN_" + to_string(speed);
+            id(cappa_statemachine).transition(transition_name);
+          }

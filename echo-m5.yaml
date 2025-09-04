@@ -1,0 +1,8 @@
+substitutions:
+  device_name: m5stack-atom-echo
+  device_friendly_name: M5Stack Atom Echo
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.echo_m5.yaml
+  downstairs: !include common/.downstairs.yaml
