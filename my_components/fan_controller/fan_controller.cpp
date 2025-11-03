@@ -120,6 +120,8 @@ void FanController::update_from_leds() {
 }
 
 void FanController::queue_operation(OperationType type, uint8_t value) {
+  ESP_LOGI(TAG, "Queuing operation type %d with value %d",
+            static_cast<int>(current_operation_->type), value);
   operation_queue_.push(Operation(type, value));
 }
 
