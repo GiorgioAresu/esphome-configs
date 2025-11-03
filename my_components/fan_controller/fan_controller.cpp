@@ -131,18 +131,18 @@ void FanController::start_next_operation() {
   current_operation_ = new Operation(operation_queue_.front());
   operation_queue_.pop();
   
-  output::BinaryOutput* output = (current_operation_->type == OperationType::POWER) ? 
+  output::BinaryOutput* output = (current_operation_->type == OperationType::POWER) ?
                                 power_output_ : speed_output_;
   
   if (output == nullptr) {
-    ESP_LOGW(TAG, "Output not configured for operation type %d", 
+    ESP_LOGW(TAG, "Output not configured for operation type %d",
              static_cast<int>(current_operation_->type));
     delete current_operation_;
     current_operation_ = nullptr;
     return;
   }
 
-  ESP_LOGD(TAG, "Starting operation type %d value %u", 
+  ESP_LOGD(TAG, "Starting operation type %d value %u",
            static_cast<int>(current_operation_->type), current_operation_->target_value);
            
   operation_state_ = OperationState::BUTTON_PRESS;
@@ -171,7 +171,7 @@ bool FanController::handle_operation_result() {
     return false;
   }
   
-  ESP_LOGW(TAG, "Failed to reach target speed %u after %u attempts", 
+  ESP_LOGW(TAG, "Failed to reach target speed %u after %u attempts",
            current_operation_->target_value, operation_attempts_);
   return true;  // Give up after max attempts
 }
