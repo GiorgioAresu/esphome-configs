@@ -1,9 +1,9 @@
 substitutions:
-  device_name: stufetta
-  device_friendly_name: Stufetta
+  device_name: sonoff-s60
+  device_friendly_name: Sonoff S60
   
 packages:
-  base: !include common/.base.sonoff_s20.yaml
+  base: !include common/.base.sonoff-s60.yaml
   floor: !include common/.downstairs.yaml
 
 switch:
