@@ -69,7 +69,7 @@ class FanController : public Component, public fan::Fan {
 
   // Timing constants
   static const uint32_t BUTTON_PRESS_DURATION = 100;    // Duration to hold button
-  static const uint32_t BUTTON_RELEASE_DURATION = 100;  // Wait after release
+  static const uint32_t BUTTON_RELEASE_DURATION = 500;  // Wait after release
   static const uint32_t SPEED_CHANGE_TIMEOUT = 3000;    // Max time to wait for speed change
   static const uint8_t MAX_SPEED_ATTEMPTS = 4;          // Max attempts to change speed
 
