@@ -1,0 +1,489 @@
+substitutions:
+  device_name: alarm
+  device_friendly_name: Allarme
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.esp32dev.yaml
+  floor: !include common/.downstairs.yaml
+
+globals:
+  - id: keypad_content
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+
+esphome:
+  on_boot:
+    - then:
+        - script.execute: screen_wake
+
+api:
+  reboot_timeout: 0s
+  actions:
+    - action: rtttl_play
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
+
+uart:
+  - id: uart_modbus_server
+    tx_pin: GPIO17
+    rx_pin: GPIO16
+    baud_rate: 115200
+    debug:
+      direction: BOTH
+      dummy_receiver: false
+      after:
+        delimiter: "\n"
+      sequence:
+        - lambda: UARTDebug::log_string(direction, bytes);
+
+modbus:
+  - id: modbus_server
+    uart_id: uart_modbus_server
+    role: server
+
+modbus_controller:
+# - id: modbus_server
+#   address: 0x1   ## address of the Modbus slave device on the bus
+#   modbus_id: modbus_server
+#   setup_priority: -10
+  - modbus_id: modbus_server
+    address: 0x4
+    server_registers:
+      - address: 0x0002
+        value_type: S_DWORD_R
+        read_lambda: |-
+          return 666.6;
+
+alarm_control_panel:
+  - platform: template
+    name: Alarm Panel
+    id: alarm_controller
+    codes:
+      - "1234"
+    binary_sensors:
+      - input: test
+    restore_mode: RESTORE_DEFAULT_DISARMED
+
+binary_sensor:
+  - platform: gpio
+    id: test
+    pin:
+      number: GPIO23
+      mode:
+        input: true
+        pullup: true
+    name: "Finestra"
+    device_class: window
+    on_release:
+      - rtttl.play:
+          rtttl: 'scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b'
+    on_press:
+      - rtttl.play:
+          rtttl: 'siren:d=8,o=5,b=100:d,e,d,e,d,e,d,e'
+          
+
+font:
+  - file: "gfonts://Ubuntu+Mono"
+    id: font_menu
+    size: 11
+
+    # gfonts://family[@weight]
+  - file: "gfonts://Ubuntu+Mono"
+    id: roboto_16
+    size: 16
+    glyphsets:
+      - GF_Latin_Kernel
+    glyphs:
+      - "\u00c8" # È
+
+sx1509:
+  - id: sx1509_hub1
+    address: 0x3E
+    # If you need a keypad
+    keypad:
+      key_rows: 4
+      key_columns: 4
+      sleep_time: 256
+      scan_time: 2
+      debounce_time: 1
+      keys: "123A456B789C*0#D"
+      on_key:
+        then:
+          - logger.log: 
+              format: "Called with key '%c'"
+              args: [ 'x' ]
+          - script.execute: screen_wake
+          - if:
+              condition:
+                display_menu.is_active: my_graphical_display_menu
+              then:
+                - lambda: 'ESP_LOGI("keypad", "Display menu is active");'
+                - if:
+                    condition:
+                      lambda: 'return x == ''A'';'
+                    then:
+                      - display_menu.up
+                - if:
+                    condition:
+                      lambda: 'return x == ''B'';'
+                    then:
+                      - display_menu.down
+                - if:
+                    condition:
+                      lambda: 'return x == ''C'';'
+                    then:
+                      - display_menu.enter
+          - if:
+              condition:
+                lambda: 'return x == ''D'';'
+              then:
+                - if:
+                    condition:
+                      or:
+                        - display.is_displaying_page: standby
+                        - display.is_displaying_page: code
+                    then:
+                      - display_menu.show:  my_graphical_display_menu
+                    else:
+                      - display_menu.enter: my_graphical_display_menu
+
+# matrix_keypad:
+#   id: mykeypad
+#   rows:
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 0 on the SX1509
+#         number: 0
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 1 on the SX1509
+#         number: 1
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 2 on the SX1509
+#         number: 2
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 2 on the SX1509
+#         number: 3
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#   columns:
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 3 on the SX1509
+#         number: 8
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 4 on the SX1509
+#         number: 9
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 5 on the SX1509
+#         number: 10
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#     - pin: 
+#         sx1509: sx1509_hub1
+#         # Use pin number 5 on the SX1509
+#         number: 11
+#         mode:
+#           input: true
+#           pullup: true
+#         inverted: true
+#   keys: "123A456B789C*0#D"
+#   has_diodes: false
+#   on_key:
+#     then:
+#       - logger.log: 
+#           format: "Called with key '%c'"
+#           args: [ 'x' ]
+#       - script.execute: screen_wake
+#       - if:
+#           condition:
+#             display_menu.is_active: my_graphical_display_menu
+#           then:
+#             - lambda: 'ESP_LOGI("keypad", "Display menu is active");'
+#             - if:
+#                 condition:
+#                   lambda: 'return x == ''A'';'
+#                 then:
+#                   - display_menu.up
+#             - if:
+#                 condition:
+#                   lambda: 'return x == ''B'';'
+#                 then:
+#                   - display_menu.down
+#             - if:
+#                 condition:
+#                   lambda: 'return x == ''C'';'
+#                 then:
+#                   - display_menu.enter
+#       - if:
+#           condition:
+#             lambda: 'return x == ''D'';'
+#           then:
+#             - if:
+#                 condition:
+#                   or:
+#                     - display.is_displaying_page: standby
+#                     - display.is_displaying_page: code
+#                 then:
+#                   - display_menu.show:  my_graphical_display_menu
+#                 else:
+#                   - display_menu.enter: my_graphical_display_menu
+
+key_collector:
+  - id: keypad_collector
+    source_id: sx1509_hub1
+    min_length: 4
+    max_length: 4
+    end_keys: "#"
+    end_key_required: true
+    back_keys: "*"
+    clear_keys: "C"
+    allowed_keys: "0123456789"
+    timeout: 5s
+    on_progress:
+      - logger.log:
+          format: "input progress: '%s', started by '%c'"
+          args: [ 'x.c_str()', "(start == 0 ? '~' : start)" ]
+      - globals.set:
+          id: keypad_content
+          value: !lambda 'return x;'
+      - if:
+          condition:
+            display.is_displaying_page: standby
+          then:
+            - display.page.show: code
+    on_result:
+      - logger.log:
+          format: "input result: '%s', started by '%c', ended by '%c'"
+          args: [ 'x.c_str()', "(start == 0 ? '~' : start)", "(end == 0 ? '~' : end)" ]
+      - if:
+          condition:
+            lambda: return (0 == x.compare(std::string{"1234"}));
+          then:
+            - rtttl.play:
+                rtttl: 'two_short:d=4,o=5,b=100:16e6,16e6'
+          else:
+            - rtttl.play:
+                rtttl: 'long_low:d=1,o=4,b=100:a'
+    on_timeout:
+      - logger.log:
+          format: "input timeout: '%s', started by '%c'"
+          args: [ 'x.c_str()', "(start == 0 ? '~' : start)" ]
+      - globals.set:
+          id: keypad_content
+          value: '""'
+      - display.page.show: standby
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+#   scan: false
+
+display:
+  - platform: ssd1306_i2c
+    id: oled
+    model: "SH1106 128x64"
+    address: 0x3C
+    update_interval: 250ms
+    on_page_change:
+      - then:
+          lambda: |-
+            ESP_LOGD("display", "Page changed");
+          # from %s to %s", from.id.c_str(), to.id.c_str());
+      - from: code
+        then:
+          - key_collector.disable:
+      - to: code
+        then:
+          - key_collector.enable:
+    pages:
+      - id: standby
+        lambda: |-
+          it.print(0, 10, id(roboto_16), "È l'una di notte e");
+          it.print(0, 42, id(roboto_16), "tutto va bene");
+      - id: code
+        lambda: |-
+          it.print(0, 10, id(roboto_16), id(keypad_content).c_str());
+
+
+graphical_display_menu:
+  id: my_graphical_display_menu
+  display: oled
+  on_redraw:
+    then:
+      component.update: oled
+  active: false
+  mode: rotary
+  font: font_menu
+  items:
+    - id: my_label
+      type: label
+      text: 'Menu'
+    - type: menu
+      text: 'My Submenu'
+      on_enter:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "enter: %s", it->get_text().c_str());'
+      on_leave:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "leave: %s", it->get_text().c_str());'
+      items:
+        - type: label
+          text: 'Submenu 1'
+        - type: back
+          text: 'Back'
+    - type: select
+      immediate_edit: false
+      text: 'My Color'
+      select: my_color
+      on_enter:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select enter: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+      on_leave:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select leave: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+      on_value:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select value: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+    - type: select
+      immediate_edit: false
+      text: 'Baud Rate'
+      select: change_baud_rate
+      on_enter:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select enter: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+      on_leave:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select leave: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+      on_value:
+        then:
+          lambda: 'ESP_LOGI("display_menu", "select value: %s, %s", it->get_text().c_str(), it->get_value_text().c_str());'
+    - type: command
+      text: 'Exit'
+      on_value:
+        then:
+          - display_menu.hide:
+
+
+
+select:
+  - platform: template
+    id: my_color
+    optimistic: true
+    options:
+      - 'Red'
+      - 'Green'
+      - 'Blue'
+  - id: change_baud_rate
+    name: Baud rate
+    platform: template
+    options:
+      - "2400"
+      - "9600"
+      - "38400"
+      - "57600"
+      - "115200"
+      - "256000"
+      - "512000"
+      - "921600"
+    initial_option: "115200"
+    optimistic: true
+    restore_value: True
+    internal: false
+    entity_category: config
+    icon: mdi:swap-horizontal
+    set_action:
+      - lambda: |-
+          id(uart_modbus_server).flush();
+          uint32_t new_baud_rate = stoi(x);
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_modbus_server).get_baud_rate(), 
+                    new_baud_rate);
+          if (id(uart_modbus_server).get_baud_rate() != new_baud_rate) {
+            id(uart_modbus_server).set_baud_rate(new_baud_rate);
+            id(uart_modbus_server).load_settings();
+          }
+
+output:
+  # - platform: sx1509 # Doesn't work properly with rtttl
+  #   sx1509_id: sx1509_hub1
+  #   id: 'rtttl_out'
+  #   pin: 4
+  # - platform: esp8266_pwm
+  #   frequency: 1000 Hz
+  #   id: 'rtttl_out'
+  #   pin: D5
+  - platform: ledc
+    id: rtttl_out
+    ######################################################
+    # One buzzer leg connected to GPIO12, the other to GND
+    ######################################################
+    pin: GPIO19
+
+rtttl:
+  output: rtttl_out
+  id: buzzer
+  gain: 5%
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+
+text:
+  - platform: template
+    name: "RTTTL song"
+    optimistic: true
+    min_length: 0
+    max_length: 100
+    mode: text
+    set_action:
+      - rtttl.play:
+          rtttl: !lambda 'return x;'
+
+
+script:
+  - id: screen_wake
+    mode: restart
+    then:
+      - lambda: |-
+          ESP_LOGI("screen_wake", "Turning on");
+          id(oled).set_contrast(1.0);
+          id(oled).turn_on();
+      - delay: 30s
+      - lambda: |-
+          id(oled).set_contrast(0.1);
+          ESP_LOGI("screen_wake", "Dimmed to %f", id(oled).get_contrast());
+      - delay: 60s
+      - lambda: |-
+          ESP_LOGI("screen_wake", "Turning off");
+          id(oled).turn_off();
