@@ -8,10 +8,8 @@ packages:
   upstairs: !include common/.upstairs.yaml
 
 external_components:
-  - source:
-      type: local
-      path: my_components
-    components: [fan_controller]
+  - source: github://GiorgioAresu/esphome-components@main
+    components: [ fan_controller ]
 
 select:
   - platform: template
