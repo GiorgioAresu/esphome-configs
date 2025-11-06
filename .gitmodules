@@ -1,0 +1,3 @@
+[submodule "my_components"]
+	path = my_components
+	url = https://github.com/GiorgioAresu/esphome-components.git

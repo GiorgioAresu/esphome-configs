@@ -1,13 +1,12 @@
-# Gitignore settings for ESPHome
-.*history
-.cache/
-.code-server/
-!.code-server/*.json
-.esphome/
-.local/
+# Secrets file (contains passwords, API keys, etc.)
 secrets.yaml
 
+# Build artifacts
+.esphome/
+
+# Backup files
+*.bak
+*.backup
+
 # Temporary stuff
-archive
-/my-components/
-*.tar.gz
+testing/
