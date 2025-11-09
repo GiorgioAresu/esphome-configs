@@ -1,0 +1,24 @@
+packages:
+  board: !include .board.xiao_esp32c6.yaml
+
+esphome:
+  on_boot:
+      priority: 800
+      then:
+        - wifi.disable:
+        - output.turn_off: pin3 # activate RF Switch control
+        - delay: 100ms
+        - switch.turn_on: pin14
+        - wifi.enable:
+
+output:
+    platform: gpio
+    id: pin3
+    pin: GPIO03
+
+switch:
+    platform: gpio
+    pin: GPIO14
+    restore_mode: ALWAYS_OFF
+    name: "External Wifi Antenna On/Off"
+    id: pin14
