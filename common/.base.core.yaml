@@ -1,0 +1,32 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_friendly_name}
+
+# Enable logging
+logger:
+  # level: INFO
+  logs:
+    component: ERROR
+    sensor: WARN
+  # on_message:
+  #   level: DEBUG
+  #   then:
+  #     - homeassistant.action:
+  #         action: system_log.write
+  #         data:
+  #           level: !lambda |-
+  #             switch (level) {
+  #               case 0:
+  #                 return "notset";
+  #               case 1:
+  #                 return "error";
+  #               case 2:
+  #                 return "warning";
+  #               case 3:
+  #                 return "info";
+  #             }
+  #             return "debug";
+  #           logger: !lambda |-
+  #             return "esphome.${device_name}";
+  #           message: !lambda |-
+  #             return message;

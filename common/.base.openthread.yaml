@@ -1,0 +1,8 @@
+packages:
+  core: !include .base.core.yaml
+
+network:
+  enable_ipv6: true
+
+openthread:
+  tlv: !secret openthread_tlv

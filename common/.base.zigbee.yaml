@@ -1,0 +1,19 @@
+packages:
+  core: !include .base.yaml
+
+esp32:
+  partitions: partitions_zb.csv
+
+  framework:
+    sdkconfig_options:
+      CONFIG_ZB_ENABLED: y
+      CONFIG_ZB_ZED: y
+      CONFIG_ZB_RADIO_NATIVE: y
+      ZB_ED_ROLE: y
+
+external_components:
+  - source: github://luar123/zigbee_esphome
+    components: [zigbee]
+
+wifi:
+  ap: !remove
