@@ -7,37 +7,37 @@ substitutions:
   md_color_primary_container: 0xEADDFF
   md_color_on_primary: 0xFFFFFF
   md_color_on_primary_container: 0x21005D
-  
+
   md_color_secondary: 0x625B71
   md_color_secondary_container: 0xE8DEF8
   md_color_on_secondary: 0xFFFFFF
   md_color_on_secondary_container: 0x1D192B
-  
+
   md_color_tertiary: 0x7D5260
   md_color_tertiary_container: 0xFFD8E4
   md_color_on_tertiary: 0xFFFFFF
   md_color_on_tertiary_container: 0x31111D
-  
+
   md_color_error: 0xBA1A1A
   md_color_error_container: 0xFFDAD6
   md_color_on_error: 0xFFFFFF
   md_color_on_error_container: 0x410002
-  
+
   md_color_success: 0x1B5E20
   md_color_success_container: 0xC8E6C9
   md_color_on_success: 0xFFFFFF
   md_color_on_success_container: 0x0D2818
-  
+
   md_color_warning: 0xFFCE22
   md_color_warning_container: 0xFFE0B2
   md_color_on_warning: 0xFFFFFF
   md_color_on_warning_container: 0x2E1100
-  
+
   md_color_info: 0x1565C0
   md_color_info_container: 0xBBDEFB
   md_color_on_info: 0xFFFFFF
   md_color_on_info_container: 0x102A43
-  
+
   md_color_surface: 0xFFFBFE
   md_color_surface_dim: 0xDED8E1
   md_color_surface_bright: 0xFFFBFE
@@ -49,17 +49,17 @@ substitutions:
   md_color_surface_variant: 0xE7E0EC
   md_color_on_surface: 0x1C1B1F
   md_color_on_surface_variant: 0x49454F
-  
+
   md_color_outline: 0x79747E
   md_color_outline_variant: 0xCAC4D0
   md_color_inverse_surface: 0x313033
   md_color_inverse_on_surface: 0xF4EFF4
   md_color_inverse_primary: 0xD0BCFF
-  
+
   # Shadow Colors
   md_color_shadow: 0x000000
   md_color_scrim: 0x000000
-  
+
   # Typography Scale
   md_font_display_large: roboto_28
   md_font_display_medium: roboto_24
@@ -76,7 +76,7 @@ substitutions:
   md_font_label_large: roboto_12
   md_font_label_medium: roboto_10
   md_font_label_small: roboto_8
-  
+
   # Elevation & Shadows
   md_elevation_1_shadow_width: 2
   md_elevation_1_shadow_opa: 12%
@@ -88,7 +88,7 @@ substitutions:
   md_elevation_4_shadow_opa: 24%
   md_elevation_5_shadow_width: 16
   md_elevation_5_shadow_opa: 28%
-  
+
   # Corner Radius
   md_corner_extra_small: 4
   md_corner_small: 8
@@ -96,7 +96,7 @@ substitutions:
   md_corner_large: 16
   md_corner_extra_large: 28
   md_corner_full: 65535
-  
+
   # Spacing
   md_space_none: 0
   md_space_extra_small: 4
@@ -115,37 +115,37 @@ substitutions:
     border_width: ${md_space_none}
     radius: ${md_corner_medium}
     pad_all: ${md_space_medium}
-    
+
   # Base Container Style
   base_container: &base_container
     <<: *base_surface
     bg_color: ${md_color_surface_container}
-    
+
   # Base Elevation Styles
   elevation_1: &elevation_1
     shadow_width: ${md_elevation_1_shadow_width}
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_1_shadow_opa}
     shadow_ofs_y: 1
-    
+
   elevation_2: &elevation_2
     shadow_width: ${md_elevation_2_shadow_width}
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_2_shadow_opa}
     shadow_ofs_y: 2
-    
+
   elevation_3: &elevation_3
     shadow_width: ${md_elevation_3_shadow_width}
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_3_shadow_opa}
     shadow_ofs_y: 4
-    
+
   elevation_4: &elevation_4
     shadow_width: ${md_elevation_4_shadow_width}
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_4_shadow_opa}
     shadow_ofs_y: 8
-    
+
   elevation_5: &elevation_5
     shadow_width: ${md_elevation_5_shadow_width}
     shadow_color: ${md_color_shadow}
@@ -164,19 +164,19 @@ substitutions:
     pad_bottom: ${md_space_medium}
     text_font: ${md_font_label_large}
     align: center
-    
+
   # Primary Button (Filled)
   button_primary: &button_primary
     <<: [*button_base, *elevation_1]
     bg_color: ${md_color_primary}
     text_color: ${md_color_on_primary}
-    
+
   # Secondary Button (Filled Tonal)
   button_secondary: &button_secondary
     <<: [*button_base, *elevation_1]
     bg_color: ${md_color_secondary_container}
     text_color: ${md_color_on_secondary_container}
-    
+
   # Outline Button
   button_outline: &button_outline
     <<: *button_base
@@ -184,13 +184,13 @@ substitutions:
     text_color: ${md_color_primary}
     border_width: 1
     border_color: ${md_color_outline}
-    
+
   # Text Button
   button_text: &button_text
     <<: *button_base
     bg_color: transparent
     text_color: ${md_color_primary}
-    
+
   # FAB (Floating Action Button)
   button_fab: &button_fab
     <<: [*button_base, *elevation_3]
@@ -198,19 +198,19 @@ substitutions:
     text_color: ${md_color_on_primary_container}
     radius: ${md_corner_large}
     pad_all: ${md_space_large}
-    
+
   # FAB Small
   button_fab_small: &button_fab_small
     <<: *button_fab
     radius: ${md_corner_medium}
     pad_all: ${md_space_medium}
-    
+
   # FAB Large
   button_fab_large: &button_fab_large
     <<: *button_fab
     radius: ${md_corner_extra_large}
     pad_all: ${md_space_extra_large}
-    
+
   # Disabled Button
   button_disabled: &button_disabled
     <<: *button_base
@@ -224,41 +224,41 @@ substitutions:
   # Surface
   surface: &surface
     <<: *base_surface
-    
+
   # Surface Dim
   surface_dim: &surface_dim
     <<: *base_surface
     bg_color: ${md_color_surface_dim}
-    
+
   # Surface Bright
   surface_bright: &surface_bright
     <<: *base_surface
     bg_color: ${md_color_surface_bright}
-    
+
   # Surface Container Lowest
   surface_container_lowest: &surface_container_lowest
     <<: *base_surface
     bg_color: ${md_color_surface_container_lowest}
-    
+
   # Surface Container Low
   surface_container_low: &surface_container_low
     <<: *base_surface
     bg_color: ${md_color_surface_container_low}
-    
+
   # Surface Container
   surface_container: &surface_container
     <<: *base_container
-    
+
   # Surface Container High
   surface_container_high: &surface_container_high
     <<: *base_surface
     bg_color: ${md_color_surface_container_high}
-    
+
   # Surface Container Highest
   surface_container_highest: &surface_container_highest
     <<: *base_surface
     bg_color: ${md_color_surface_container_highest}
-    
+
   # Surface Variant
   surface_variant: &surface_variant
     <<: *base_surface
@@ -270,16 +270,16 @@ substitutions:
   # Base Card
   card_base: &card_base
     <<: [*surface_container, *elevation_1]
-    
+
   # Card Filled
   card_filled: &card_filled
     <<: *card_base
     bg_color: ${md_color_surface_container_highest}
-    
+
   # Card Elevated
   card_elevated: &card_elevated
     <<: [*surface_container_low, *elevation_2]
-    
+
   # Card Outlined
   card_outlined: &card_outlined
     <<: *surface_container_low
@@ -293,13 +293,13 @@ substitutions:
     <<: *base_surface
     text_font: ${md_font_body_large}
     pad_all: ${md_space_large}
-    
+
   # Filled Input
   input_filled: &input_filled
     <<: *input_base
     bg_color: ${md_color_surface_container_highest}
     radius: ${md_corner_extra_small}
-    
+
   # Outlined Input
   input_outlined: &input_outlined
     <<: *input_base
@@ -314,63 +314,63 @@ substitutions:
   display_large: &display_large
     text_font: ${md_font_display_large}
     text_color: ${md_color_on_surface}
-    
+
   display_medium: &display_medium
     text_font: ${md_font_display_medium}
     text_color: ${md_color_on_surface}
-    
+
   display_small: &display_small
     text_font: ${md_font_display_small}
     text_color: ${md_color_on_surface}
-    
+
   # Headline Typography
   headline_large: &headline_large
     text_font: ${md_font_headline_large}
     text_color: ${md_color_on_surface}
-    
+
   headline_medium: &headline_medium
     text_font: ${md_font_headline_medium}
     text_color: ${md_color_on_surface}
-    
+
   headline_small: &headline_small
     text_font: ${md_font_headline_small}
     text_color: ${md_color_on_surface}
-    
+
   # Title Typography
   title_large: &title_large
     text_font: ${md_font_title_large}
     text_color: ${md_color_on_surface}
-    
+
   title_medium: &title_medium
     text_font: ${md_font_title_medium}
     text_color: ${md_color_on_surface}
-    
+
   title_small: &title_small
     text_font: ${md_font_title_small}
     text_color: ${md_color_on_surface_variant}
-    
+
   # Body Typography
   body_large: &body_large
     text_font: ${md_font_body_large}
     text_color: ${md_color_on_surface}
-    
+
   body_medium: &body_medium
     text_font: ${md_font_body_medium}
     text_color: ${md_color_on_surface}
-    
+
   body_small: &body_small
     text_font: ${md_font_body_small}
     text_color: ${md_color_on_surface_variant}
-    
+
   # Label Typography
   label_large: &label_large
     text_font: ${md_font_label_large}
     text_color: ${md_color_on_surface}
-    
+
   label_medium: &label_medium
     text_font: ${md_font_label_medium}
     text_color: ${md_color_on_surface}
-    
+
   label_small: &label_small
     text_font: ${md_font_label_small}
     text_color: ${md_color_on_surface_variant}
@@ -385,7 +385,7 @@ substitutions:
       flex_align_main: start
       flex_align_cross: stretch
       pad_row: ${md_space_small}
-      
+
   # Flex Layout - Row
   flex_row: &flex_row
     layout:
@@ -394,7 +394,7 @@ substitutions:
       flex_align_main: start
       flex_align_cross: center
       pad_column: ${md_space_small}
-      
+
   # Grid Layout - 2 Column
   grid_2_column: &grid_2_column
     layout:
@@ -403,7 +403,7 @@ substitutions:
       grid_rows: [content]
       pad_column: ${md_space_medium}
       pad_row: ${md_space_medium}
-      
+
   # Grid Layout - 3 Column
   grid_3_column: &grid_3_column
     layout:
@@ -430,7 +430,7 @@ substitutions:
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_1_shadow_opa}
     shadow_ofs_y: 1
-    
+
   md_button_secondary: |
     bg_color: ${md_color_secondary_container}
     text_color: ${md_color_on_secondary_container}
@@ -445,7 +445,7 @@ substitutions:
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_1_shadow_opa}
     shadow_ofs_y: 1
-    
+
   md_button_outline: |
     bg_color: ${md_color_surface}
     text_color: ${md_color_primary}
@@ -458,7 +458,7 @@ substitutions:
     align: center
     border_width: 1
     border_color: ${md_color_outline}
-    
+
   md_button_text: |
     bg_color: transparent
     text_color: ${md_color_primary}
@@ -469,7 +469,7 @@ substitutions:
     pad_bottom: ${md_space_medium}
     text_font: ${md_font_label_large}
     align: center
-    
+
   md_button_fab: |
     bg_color: ${md_color_primary_container}
     text_color: ${md_color_on_primary_container}
@@ -481,7 +481,7 @@ substitutions:
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_3_shadow_opa}
     shadow_ofs_y: 4
-    
+
   md_button_disabled: |
     bg_color: ${md_color_on_surface}
     text_color: ${md_color_surface}
@@ -494,20 +494,20 @@ substitutions:
     pad_bottom: ${md_space_medium}
     text_font: ${md_font_label_large}
     align: center
-    
+
   # Surface Styles
   md_surface: |
     bg_color: ${md_color_surface}
     text_color: ${md_color_on_surface}
     radius: ${md_corner_medium}
     pad_all: ${md_space_medium}
-    
+
   md_surface_container: |
     bg_color: ${md_color_surface_container}
     text_color: ${md_color_on_surface}
     radius: ${md_corner_medium}
     pad_all: ${md_space_medium}
-    
+
   # Card Styles
   md_card_filled: |
     bg_color: ${md_color_surface_container_highest}
@@ -518,7 +518,7 @@ substitutions:
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_1_shadow_opa}
     shadow_ofs_y: 1
-    
+
   md_card_elevated: |
     bg_color: ${md_color_surface_container_low}
     text_color: ${md_color_on_surface}
@@ -528,7 +528,7 @@ substitutions:
     shadow_color: ${md_color_shadow}
     shadow_opa: ${md_elevation_2_shadow_opa}
     shadow_ofs_y: 2
-    
+
   md_card_outlined: |
     bg_color: ${md_color_surface_container_low}
     text_color: ${md_color_on_surface}
@@ -551,7 +551,7 @@ substitutions:
             then:
               - logger.log: "${label} pressed"
 
-  # # Card Component Template  
+  # # Card Component Template
   # Usage: !include_with_vars card_template.yaml { title: "Card Title", content: "Card content", style: "${md_card_filled}" }
   card_template: &card_template
     - obj:

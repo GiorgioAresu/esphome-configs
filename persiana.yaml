@@ -11,7 +11,7 @@ packages:
 #   - platform: gpio
 #     pin:
 #       number: D5
-#       mode: 
+#       mode:
 #         input: True
 #         pullup: True
 #       # inverted: True

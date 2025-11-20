@@ -1,5 +1,5 @@
 - obj:
-    align_to: 
+    align_to:
         id: status_bar
         align: OUT_BOTTOM_MID
     height: 56
@@ -20,7 +20,7 @@
     - label:
         text: ${title}
         id: lbl_page_title
-        align_to: 
+        align_to:
             id: lbl_page_icon
             align: OUT_RIGHT_MID
             x: ${md_space_extra_small}

@@ -63,7 +63,7 @@ display:
     color_order: RGB
     dimensions:
       width: 480
-      height: 480  
+      height: 480
     de_pin:
       number: 40
       inverted: false
@@ -95,7 +95,7 @@ display:
         - 12         # G2
         - 11         # G3
         - 16         # G4
-        - 17         # G5 
+        - 17         # G5
       blue:
         - number: 45 # B1
           allow_other_uses: true
@@ -145,7 +145,7 @@ script:
       - lvgl.resume:
       - light.turn_on:
           id: backlight
-          brightness: 100%          
+          brightness: 100%
           transition_length: 1s
       - delay: 30s
       - light.turn_on:

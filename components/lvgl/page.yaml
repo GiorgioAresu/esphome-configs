@@ -1,6 +1,6 @@
 - id: ${id}
   on_load:
-    then: !include 
+    then: !include
       file: ./page_load_events.yaml
       vars:
         icon: ${icon}

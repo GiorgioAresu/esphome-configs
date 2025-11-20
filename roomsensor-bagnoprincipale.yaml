@@ -29,7 +29,7 @@ binary_sensor:
         pullup: true
     name: "Finestra"
     device_class: window
-    
+
   # - platform: dht
   #   pin:
   #     number: GPIO16

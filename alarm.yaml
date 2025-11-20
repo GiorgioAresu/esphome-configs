@@ -85,7 +85,7 @@ binary_sensor:
     on_press:
       - rtttl.play:
           rtttl: 'siren:d=8,o=5,b=100:d,e,d,e,d,e,d,e'
-          
+
 
 font:
   - file: "gfonts://Ubuntu+Mono"
@@ -114,7 +114,7 @@ sx1509:
       keys: "123A456B789C*0#D"
       on_key:
         then:
-          - logger.log: 
+          - logger.log:
               format: "Called with key '%c'"
               args: [ 'x' ]
           - script.execute: screen_wake
@@ -155,7 +155,7 @@ sx1509:
 # matrix_keypad:
 #   id: mykeypad
 #   rows:
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 0 on the SX1509
 #         number: 0
@@ -163,7 +163,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 1 on the SX1509
 #         number: 1
@@ -171,7 +171,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 2 on the SX1509
 #         number: 2
@@ -179,7 +179,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 2 on the SX1509
 #         number: 3
@@ -188,7 +188,7 @@ sx1509:
 #           pullup: true
 #         inverted: true
 #   columns:
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 3 on the SX1509
 #         number: 8
@@ -196,7 +196,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 4 on the SX1509
 #         number: 9
@@ -204,7 +204,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 5 on the SX1509
 #         number: 10
@@ -212,7 +212,7 @@ sx1509:
 #           input: true
 #           pullup: true
 #         inverted: true
-#     - pin: 
+#     - pin:
 #         sx1509: sx1509_hub1
 #         # Use pin number 5 on the SX1509
 #         number: 11
@@ -224,7 +224,7 @@ sx1509:
 #   has_diodes: false
 #   on_key:
 #     then:
-#       - logger.log: 
+#       - logger.log:
 #           format: "Called with key '%c'"
 #           args: [ 'x' ]
 #       - script.execute: screen_wake
@@ -429,7 +429,7 @@ select:
       - lambda: |-
           id(uart_modbus_server).flush();
           uint32_t new_baud_rate = stoi(x);
-          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_modbus_server).get_baud_rate(), 
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_modbus_server).get_baud_rate(),
                     new_baud_rate);
           if (id(uart_modbus_server).get_baud_rate() != new_baud_rate) {
             id(uart_modbus_server).set_baud_rate(new_baud_rate);

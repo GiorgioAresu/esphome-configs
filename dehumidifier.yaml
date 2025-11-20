@@ -33,7 +33,7 @@ sensor:
     type: sum
     id: fan_speed_sensor
     name: "Fan Speed Sensor"
-    channels: 
+    channels:
       - binary_sensor: led_7
         value: 1
       - binary_sensor: led_6
@@ -126,7 +126,7 @@ binary_sensor:
       number: GPIO17
       inverted: true
       mode: INPUT_PULLUP
-    on_state: 
+    on_state:
       then:
         - script.execute: update_mode
   - platform: gpio
@@ -136,7 +136,7 @@ binary_sensor:
       number: GPIO18
       inverted: true
       mode: INPUT_PULLUP
-    on_state: 
+    on_state:
       then:
         - script.execute: update_mode
   - platform: gpio
@@ -146,7 +146,7 @@ binary_sensor:
       number: GPIO19
       inverted: true
       mode: INPUT_PULLUP
-    on_state: 
+    on_state:
       then:
         - script.execute: update_mode
   - platform: gpio

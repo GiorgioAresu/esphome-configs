@@ -71,7 +71,7 @@ state_machine:
     # diagram: dot
     states:
       - name: LIGHT_OFF_FAN_0
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111111111011'
             protocol: 6
@@ -79,7 +79,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_OFF_FAN_1
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111101111011'
             protocol: 6
@@ -87,7 +87,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_OFF_FAN_2
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111011111011'
             protocol: 6
@@ -95,7 +95,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_OFF_FAN_3
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111001111011'
             protocol: 6
@@ -103,7 +103,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_OFF_FAN_4
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111110111111011'
             protocol: 6
@@ -111,7 +111,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_ON_FAN_0
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111110111011'
             protocol: 6
@@ -119,7 +119,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_ON_FAN_1
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111100111011'
             protocol: 6
@@ -127,7 +127,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_ON_FAN_2
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111010111011'
             protocol: 6
@@ -135,7 +135,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_ON_FAN_3
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111111000111011'
             protocol: 6
@@ -143,7 +143,7 @@ state_machine:
               times: 10
               wait_time: 0s
       - name: LIGHT_ON_FAN_4
-        on_enter: 
+        on_enter:
           remote_transmitter.transmit_rc_switch_raw:
             code: '0111110110111011'
             protocol: 6

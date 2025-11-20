@@ -12,10 +12,10 @@ switch:
     id: pump
     pin: GPIO1 # TXD
     inverted: True
-    on_turn_on: 
+    on_turn_on:
       then:
         light.turn_on: led
-    on_turn_off: 
+    on_turn_off:
       then:
         light.turn_off: led
 
@@ -30,7 +30,7 @@ button:
   - platform: template
     id: reset_runtime
     name: Resetta tempo funzionamento
-    on_press: 
+    on_press:
       then:
         sensor.duty_time.reset: pump_total_runtime
 

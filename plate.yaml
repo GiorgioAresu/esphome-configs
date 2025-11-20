@@ -1,7 +1,7 @@
 substitutions:
   device_name: plate
   device_friendly_name: Plate
-  
+
   # alarm_code_placeholder: "CODE"
 
   icon_wifi: "\U000F05A9" #mdi:wifi
@@ -13,7 +13,7 @@ substitutions:
   icon_alarm_state_armed_away: "\U000F099D" #mdi:shield-lock
   icon_alarm_state_armed_home: "\U000F068A" #mdi:shield-home
   icon_alarm_state_armed_night: "\U000F1828" #mdi:shield-moon
-  
+
 
 packages:
   base: !include common/.base.ZX3D95CE01S-TR.yaml
@@ -83,7 +83,7 @@ key_collector:
     back_keys: "*"
     allowed_keys: "0123456789*#"
     timeout: 5s
-    on_timeout: 
+    on_timeout:
       then:
         - lvgl.widget.hide: keypad_dialog
     on_progress:
@@ -235,7 +235,7 @@ lvgl:
                 id: lbl_wifi_status
                 text: $icon_wifi
                 hidden: true
-      - <<: !include 
+      - <<: !include
           file: components/lvgl/page_title.yaml
           vars:
             icon: $icon_ha
@@ -305,7 +305,7 @@ lvgl:
 
   page_wrap: true
   pages:
-    - <<: !include 
+    - <<: !include
         file: components/lvgl/page.yaml
         vars:
           id: alarm_page
@@ -367,7 +367,7 @@ lvgl:
                       pad_all: $md_space_medium
                       radius: $md_corner_large
                       bg_color: $md_color_surface_container_highest
-                      
+
                       shadow_width: ${md_elevation_3_shadow_width}
                       shadow_color: ${md_color_shadow}
                       shadow_opa: ${md_elevation_3_shadow_opa}
@@ -472,7 +472,7 @@ lvgl:
                                       no_repeat: true
                                       recolor: true
                                     id: alarm_confirm_btn
-    - <<: !include 
+    - <<: !include
         file: components/lvgl/page.yaml
         vars:
           id: test_page
