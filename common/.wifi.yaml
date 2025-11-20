@@ -3,6 +3,7 @@ wifi:
   ap:
     ssid: ${device_name}_hotspot
     password: !secret fallback_password
+  min_auth_mode: WPA2
 captive_portal:
 
 # Enable Home Assistant API
