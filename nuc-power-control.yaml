@@ -1,0 +1,133 @@
+substitutions:
+  device_name: nuc-power-control
+  device_friendly_name: NUC Power Control
+  pwr_delay: 750ms
+
+packages:
+  base: !include common/.base.yaml
+  board: !include common/.board.amica_nodemcuv2.yaml
+  floor: !include common/.downstairs.yaml
+
+logger:
+  baud_rate: 0  # Disable serial, use WiFi logs only
+
+uart:
+  # https://github.com/jetkvm/kvm/blob/main/serial.go#L254-L259
+  id: jetkvm_uart
+  rx_pin: GPIO3  # RX pin
+  tx_pin: GPIO1  # TX pin
+  baud_rate: 115200
+
+sensor:
+  - platform: template
+    name: "JetKVM Voltage"
+    id: jetkvm_voltage
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 2
+
+  - platform: template
+    name: "JetKVM Current"
+    id: jetkvm_current
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+    accuracy_decimals: 2
+
+  - platform: template
+    name: "JetKVM Power"
+    id: jetkvm_power
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 2
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          std::string line = "";
+          while (id(jetkvm_uart).available()) {
+            uint8_t c;
+            id(jetkvm_uart).read_byte(&c);
+
+            if (c == '\n' || c == '\r') {
+              if (line.length() > 0) {
+                ESP_LOGD("UART", "Received: %s", line.c_str());
+
+                // Parse semicolon-delimited values
+                std::vector<std::string> values;
+                size_t start = 0;
+                size_t end = 0;
+
+                while ((end = line.find(';', start)) != std::string::npos) {
+                  values.push_back(line.substr(start, end - start));
+                  start = end + 1;
+                }
+                values.push_back(line.substr(start)); // Last value
+
+                if (values.size() >= 4) {
+                  // Field 0: Power state
+                  int status = atoi(values[0].c_str());
+                  if (status == 1) {
+                    id(jetkvm_power_switch).publish_state(true);
+                  } else if (status == 0) {
+                    id(jetkvm_power_switch).publish_state(false);
+                  }
+
+                  // Field 1: Voltage (mV -> V)
+                  float voltage = atof(values[1].c_str()) / 1000.0;
+                  id(jetkvm_voltage).publish_state(voltage);
+
+                  // Field 2: Current (mA -> A)
+                  float current = atof(values[2].c_str()) / 1000.0;
+                  id(jetkvm_current).publish_state(current);
+
+                  // Field 3: Power (mW -> W)
+                  float power = atof(values[3].c_str()) / 1000.0;
+                  id(jetkvm_power).publish_state(power);
+                } else {
+                  ESP_LOGW("UART", "Expected 4 values, got %d", values.size());
+                }
+
+                line = "";
+              }
+            } else {
+              line += (char)c;
+            }
+          }
+
+switch:
+  - platform: template
+    name: "JetKVM Relay"
+    id: jetkvm_power_switch
+    optimistic: false
+    turn_on_action:
+      - uart.write:
+          id: jetkvm_uart
+          data: "PWR_ON\n"
+      - logger.log: "Sent PWR_ON command, waiting ${pwr_delay}"
+      - delay: ${pwr_delay}
+      - logger.log: "Power button pressed"
+    turn_off_action:
+      - uart.write:
+          id: jetkvm_uart
+          data: "PWR_OFF\n"
+      - logger.log: "Sent PWR_OFF command"
+
+button:
+  - platform: template
+    id: pwr_button
+    name: "Power button"
+    on_press:
+      - output.turn_on: pwr_pin
+      - delay: 200ms
+      - output.turn_off: pwr_pin
+
+output:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+    id: pwr_pin
