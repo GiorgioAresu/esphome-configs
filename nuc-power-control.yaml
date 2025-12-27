@@ -1,7 +1,7 @@
 substitutions:
   device_name: nuc-power-control
   device_friendly_name: NUC Power Control
-  pwr_delay: 750ms
+  pwr_delay: 400ms
 
 packages:
   base: !include common/.base.yaml
@@ -20,7 +20,7 @@ uart:
 
 sensor:
   - platform: template
-    name: "JetKVM Voltage"
+    name: "DC Voltage"
     id: jetkvm_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -28,7 +28,7 @@ sensor:
     accuracy_decimals: 2
 
   - platform: template
-    name: "JetKVM Current"
+    name: "DC Current"
     id: jetkvm_current
     unit_of_measurement: "A"
     device_class: current
@@ -36,7 +36,7 @@ sensor:
     accuracy_decimals: 2
 
   - platform: template
-    name: "JetKVM Power"
+    name: "DC Power"
     id: jetkvm_power
     unit_of_measurement: "W"
     device_class: power
@@ -46,6 +46,7 @@ sensor:
 interval:
   - interval: 100ms
     then:
+      # Parse serial data and update sensors
       - lambda: |-
           std::string line = "";
           while (id(jetkvm_uart).available()) {
@@ -71,9 +72,11 @@ interval:
                   // Field 0: Power state
                   int status = atoi(values[0].c_str());
                   if (status == 1) {
-                    id(jetkvm_power_switch).publish_state(true);
+                    id(jetkvm_relay).publish_state(true);
+                    id(nuc_power).publish_state(true);
                   } else if (status == 0) {
-                    id(jetkvm_power_switch).publish_state(false);
+                    id(jetkvm_relay).publish_state(false);
+                    id(nuc_power).publish_state(false);
                   }
 
                   // Field 1: Voltage (mV -> V)
@@ -100,34 +103,73 @@ interval:
 
 switch:
   - platform: template
-    name: "JetKVM Relay"
-    id: jetkvm_power_switch
+    name: "Relay"
+    id: jetkvm_relay
+    entity_category: diagnostic
     optimistic: false
     turn_on_action:
       - uart.write:
           id: jetkvm_uart
           data: "PWR_ON\n"
-      - logger.log: "Sent PWR_ON command, waiting ${pwr_delay}"
-      - delay: ${pwr_delay}
-      - logger.log: "Power button pressed"
+      - logger.log: "Sent PWR_ON command"
     turn_off_action:
       - uart.write:
           id: jetkvm_uart
           data: "PWR_OFF\n"
       - logger.log: "Sent PWR_OFF command"
+  - platform: template
+    name: "NUC Power"
+    id: nuc_power
+    optimistic: false
+    turn_on_action:
+      - button.press: sequence_on
+    turn_off_action:
+      - button.press: sequence_off
+
+  # This just makes sure the pin is actually at 0v when off. Don't ask.
+  - platform: output
+    output: pwr_button_pin
+    id: pwr_button_switch
+    internal: true
+    restore_mode: ALWAYS_OFF
 
 button:
   - platform: template
-    id: pwr_button
-    name: "Power button"
+    id: pwr_button_short
+    name: "Power button - Short press"
     on_press:
-      - output.turn_on: pwr_pin
-      - delay: 200ms
-      - output.turn_off: pwr_pin
+      - output.turn_on: pwr_button_pin
+      - delay: 250ms
+      - output.turn_off: pwr_button_pin
+  - platform: template
+    id: pwr_button_long
+    name: "Power button - Hard reset"
+    on_press:
+      - output.turn_on: pwr_button_pin
+      - delay: 10s
+      - output.turn_off: pwr_button_pin
+  - platform: template
+    id: sequence_on
+    name: "Turn NUC on"
+    internal: true
+    on_press:
+      - logger.log: "Resetting DC power"
+      - switch.turn_off: jetkvm_relay
+      - delay: 100ms
+      - switch.turn_on: jetkvm_relay
+      - logger.log: "Waiting ${pwr_delay} before pressing button"
+      - delay: ${pwr_delay}
+      - button.press: pwr_button_short
+      - logger.log: "Power button pressed"
+  - platform: template
+    id: sequence_off
+    internal: true
+    name: "Turn NUC off"
+    on_press:
+      - logger.log: "Shutting down relay"
+      - switch.turn_off: jetkvm_relay
 
 output:
   - platform: gpio
-    pin:
-      number: GPIO9
-      inverted: true
-    id: pwr_pin
+    pin: GPIO5
+    id: pwr_button_pin
